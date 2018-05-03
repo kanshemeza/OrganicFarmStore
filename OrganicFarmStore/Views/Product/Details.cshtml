@@ -1,0 +1,19 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Details";
+}
+<div class="row">
+    <div class="col-sm-12 col-md-4">
+        <img class="img-fluid rounded-circle" src="@Model.Image" alt="@Model.Name" />
+
+    </div>
+
+    <div class="col-sm-12 col-md-8">
+        <h2>@Model.Name</h2>
+        <p>@Model.Description</p>
+        <h4>Price: @(Model.Price.HasValue ? Model.Price.Value.ToString("C") : "No Price")</h4>
+        <button class="btn btn-primary">Add to Cart</button>
+    </div>
+</div>
+
+
