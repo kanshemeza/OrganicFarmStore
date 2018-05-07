@@ -53,7 +53,7 @@ namespace OrganicFarmStore.Controllers
                     if (passwordResult.Succeeded)
                     {
                         //this._signInManager.SignInAsync(newUser, false);
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("SignIn", "Account");
                     }
                     else
                     {
@@ -92,29 +92,28 @@ namespace OrganicFarmStore.Controllers
                 IdentityUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
                 if(existingUser != null)
                 {
-                    var chkpasswordResult =_signInManager.UserManager.CheckPasswordAsync(existingUser, password).Result;
-                    if (chkpasswordResult)
+                    Microsoft.AspNetCore.Identity.SignInResult passwordResult =this._signInManager.CheckPasswordSignInAsync(existingUser, password, false).Result;
+                    if (passwordResult.Succeeded)
                     {
-                        _signInManager.SignInAsync(existingUser, false);
+                        _signInManager.SignInAsync(existingUser, false).Wait();
                         return RedirectToAction("Index", "Product");
                     }
                     else
                     {
-                        ModelState.AddModelError("username"," Wrong username or password");
+                        ModelState.AddModelError("password"," Wrong username or password");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("password", "Wrong username or password");
+                    ModelState.AddModelError("username", "Wrong username or password");
                 }
             }
             return View();
         }
-        [HttpPost]
         public IActionResult SignOut()
         {
-            _signInManager.SignOutAsync().Wait();
-            return RedirectToAction("Idex", "Home");
+           this._signInManager.SignOutAsync().Wait();
+            return RedirectToAction("Index", "Home");
         }
     }
 }
