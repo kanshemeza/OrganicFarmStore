@@ -15,18 +15,18 @@ namespace OrganicFarmStore.Controllers
         {
             _products = new List<Product>();
 
-            _products.Add(new Product
+            _products.Add(new Product()
             {
                 ID = 1,
-                Name = "Tomatoes",
+                Name = "Ginger",
                 Description = "Lorem ipsum dolor sit amet, " +
                 "nec reque platonem philosophia ei. Dolores " +
                 "salutandi voluptatibus sit no",
-                Image = "/images/tomatoes.jpg",
+                Image = "/images/ginger-root.png",
                 Price = 6.97m,
                 Category = "Fresh"
             });
-            _products.Add(new Product
+            _products.Add(new Product()
             {
                 ID = 2,
                 Name = "Raspberry",
@@ -37,10 +37,23 @@ namespace OrganicFarmStore.Controllers
                 Price = 2.97m,
                 Category = "Fresh"
             });
+            _products.Add(new Product
+            {
+                ID = 3,
+                Name = "HassAvocado",
+                Description = "Virtute propriae " +
+                "honestatis ad vim, habeo inciderint adversarium vix ea, " +
+                "luptatum reprehendunt an mea",
+                Image = "/images/HassAvocado.jpg",
+                Price = 2.95m,
+                Category = "Fresh"
+            });
         }
         public IActionResult Index()
         {
+            
             return View(_products);
+            
         }
 
         public IActionResult Details(int? id)
@@ -52,6 +65,11 @@ namespace OrganicFarmStore.Controllers
             }
             return NotFound();
            
+        }
+        public IActionResult Inde()
+        {
+            
+            return View();
         }
     }
 }

@@ -1,17 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Contact";
+    ViewData["Title"] = "Contact us";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
+<div class="mx-auto mt-3" style="width:40%;">
+    <h2>@ViewData["Title"]</h2>
+</div>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<div class="row mt-5">
+    <div class="col-sm-12 col-md-5">
+        <address>
+            246 East Ohio St,&nbsp;&nbsp;Suite 450<br />
+            Chicago, IL 60614-6399<br />
+            @*<abbr title="Phone">P:</abbr>*@
+            <strong>Phone:</strong> 425.555.0100
+        </address>
+        <address>
+            <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
+            <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+        </address>
+    </div>
 
-<address>
-    <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+    <div class="col-sm-12 col-md-7">
+        @if (!ViewData.ModelState.IsValid)
+        {
+           <div class="alert alert-danger">
+               <div asp-validation-summary="All"></div>
+           </div>
+
+        }
+        <form method="post">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input name="name" placeholder="Enter your First and Last names" class="form-control" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input name="email" class="form-control" placeholder="Enter your Email" type="email" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input name="phone" class="form-control" placeholder="Provide your phone number" type="tel" />
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea name="message" class="form-control" rows="3" placeholder="Enter your Message"></textarea>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </form>
+    </div>
+
+</div>
+
+
+

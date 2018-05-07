@@ -1,0 +1,17 @@
+﻿@model Product
+
+<div class="col-sm-6 col-md-4">
+    <div class="card text-justify mb-4 border-0">
+
+        <div class="card-body">
+            <img class="img-fluid card-img-top" src="@Model.Image" />
+            <div class="card-title">
+                <h5 class="float-left">@Model.Name</h5>
+                <h5 class="float-right text-warning">@(Model.Price.HasValue ? Model.Price.Value.ToString("C") : "No Price") <span>/lb</span></h5>
+            </div>
+                <p class="pt-2 float-left">@Model.Description</p>
+            <a class="btn btn-primary mx-auto" href="/Product/Details/@Model.ID">View This Product</a>
+        </div>
+    </div>
+</div>
+

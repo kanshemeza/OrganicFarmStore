@@ -1,26 +1,28 @@
-﻿@model IEnumerable<Product> 
+﻿@model IEnumerable<OrganicFarmStore.Models.Product> 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Showing @Model.Count() products</h2>
+@*<h2>Showing @Model.Count() products</h2>*@
 
-<div class="row">
+<div class="row mt-5">
     @foreach(var product in Model)
     {
-    <div class="col-sm-12 col-md-6">
-        <div class="card text-center">
-            <div class="card-header">
-                <h3>@product.Name</h3>
-            </div>
+        @Html.Partial("ProductOverView", product)
+    @*<div class="col-sm-6 col-md-4">
+        <div class="card text-center mb-4">
+
             <div class="card-body">
-                <img class="img-fluid" src="@product.Image" />
+                <img class="img-fluid card-img-top" src="@product.Image" />
+                <div class="card-title">
+                    <h3>@product.Name</h3>
+                </div>
                 <p>@product.Description</p>
                 <h4>Price: @(product.Price.HasValue ? product.Price.Value.ToString("C") : "No Price")</h4>
                 <a class="btn btn-primary" href="/Product/Details/@product.ID">View This Product</a>
             </div>
         </div>
-    </div>
+    </div>*@
 
     }
 </div>
