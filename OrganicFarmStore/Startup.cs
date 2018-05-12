@@ -14,16 +14,19 @@ namespace OrganicFarmStore
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; } // Will help reading our secrets.json file which contains our connection string
+        public Startup(IConfiguration configuration) 
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Configuration.GetConnectionString("AdventureWorks2016");
+            Configuration.GetConnectionString("FinalProjDB");
+
             //Singleton:Creates one service when the app starts then it will be the same for every request
             //Transient:Constructed and destructed every single request
             //services.AddTransient<SampleService>();
