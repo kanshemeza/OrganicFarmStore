@@ -1,6 +1,8 @@
 ﻿body {
     background-image: url(../images/pattern.png);
     background-repeat: repeat;
+    font-family: 'Cantarell', sans-serif;
+    font-size: 1.2em;
 }
 
 /*.caption {

@@ -18,8 +18,8 @@ namespace OrganicFarmStore.Controllers
         //    this._sampleService = sampleService;
         //    var taxAmount = this._sampleService.CalculateSalesTax(1000m);
         //}
-        SignInManager<IdentityUser> _signInManager;
-        public AccountController(SignInManager<IdentityUser> signInManager)
+        SignInManager<OrganicStoreUser> _signInManager;
+        public AccountController(SignInManager<OrganicStoreUser> signInManager)
         {
             this._signInManager = signInManager;
         }
@@ -43,7 +43,15 @@ namespace OrganicFarmStore.Controllers
             if (ModelState.IsValid)
             {
                 //TODO: Create an account and log him in
-                IdentityUser newUser = new IdentityUser(model.UserName);
+                //  OrganicStoreUser newUser = new OrganicStoreUser(model.UserName);
+                OrganicStoreUser newUser = new OrganicStoreUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
                 IdentityResult creationResult = this._signInManager.UserManager.CreateAsync(newUser).Result;
 
                 if (creationResult.Succeeded)
@@ -89,8 +97,9 @@ namespace OrganicFarmStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
-                if(existingUser != null)
+                // IdentityUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
+                OrganicStoreUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
+                if (existingUser != null)
                 {
                     Microsoft.AspNetCore.Identity.SignInResult passwordResult =this._signInManager.CheckPasswordSignInAsync(existingUser, password, false).Result;
                     if (passwordResult.Succeeded)

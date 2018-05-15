@@ -12,12 +12,14 @@ namespace OrganicFarmStore.Controllers
 {
     public class ProductController : Controller
     {
+        private readonly OrganicStoreDbContext _context;
         private List<Product> _products;
         private string _AdventureWorks2016ConnectionString = null;
         private string _FinalProjDBConnectionString = null;
 
-        public ProductController(IConfiguration config, IConfiguration fpconfig)
+        public ProductController(IConfiguration config, IConfiguration fpconfig, OrganicStoreDbContext context)
         {
+            _context = context;
             _AdventureWorks2016ConnectionString = config.GetConnectionString("AdventureWorks2016");
             _FinalProjDBConnectionString = fpconfig.GetConnectionString("FinalProjDB");
             _products = new List<Product>();
@@ -57,6 +59,7 @@ namespace OrganicFarmStore.Controllers
             //});
 
             //string connectionString = @"Data Source = (localdb)\MSSQLLocalDB; Initial Catalog = AdventureWorks2016; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = True; ApplicationIntent = ReadWrite; MultiSubnetFailover = False";
+
             using (SqlConnection connection = new SqlConnection(_FinalProjDBConnectionString))
             {
                 connection.Open();
@@ -68,41 +71,56 @@ namespace OrganicFarmStore.Controllers
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        int idColumn = reader.GetOrdinal("ID");
+                        int nameColumn = reader.GetOrdinal("ProductName");
+                        int descriptionColumn = reader.GetOrdinal("ProductDescription");
+                        int imageColumn = reader.GetOrdinal("ProductImages");
+                        int priceColumn = reader.GetOrdinal("Price");
+
+
                         while (reader.Read())
                         {
-                            int productModelId = reader.GetInt32(0);
-                            string name = reader.GetString(1);
-                            string description = reader.GetString(2);
+                            int productModelId = reader.GetInt32(idColumn);
+                            string name = reader.GetString(nameColumn);
+                            string description = reader.GetString(descriptionColumn);
+                            string image = reader.GetString(imageColumn);
+                            decimal price = reader.GetSqlMoney(priceColumn).ToDecimal();
+                          // decimal pric = reader.IsDBNull(priceColumn) ? (decimal?)null : reader.GetSqlMoney(priceColumn).ToDecimal();
                             _products.Add(new Product
                             {
                                 ID = productModelId,
                                 Description = description,
-                                Name = name
-                            });
+                                Name = name,
+                                Image = image,
+                                Price = price
+
+                        });
                         }
                     }
                 }
 
-                foreach (var product in _products)
-                {
-                    using (SqlCommand imageAndPriceCommand = connection.CreateCommand())
-                    {
-                        imageAndPriceCommand.CommandText = "sp_GetProductImages";
-                        imageAndPriceCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                        imageAndPriceCommand.Parameters.AddWithValue("@productModelID", product.ID);
-                        using (SqlDataReader reader2 = imageAndPriceCommand.ExecuteReader())
-                        {
-                            while (reader2.Read())
-                            {
-                                product.Price = reader2.IsDBNull(0) ? (decimal?)null : reader2.GetSqlMoney(0).ToDecimal();
+                //foreach (var product in _products)
+                //{
+                //    using (SqlCommand imageAndPriceCommand = connection.CreateCommand())
+                //    {
+                //        imageAndPriceCommand.CommandText = "sp_GetProductImages";
+                //        imageAndPriceCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                //        imageAndPriceCommand.Parameters.AddWithValue("@productModelID", product.ID);
+                //        using (SqlDataReader reader2 = imageAndPriceCommand.ExecuteReader())
+                //        {
+                //            int priceColumn = reader2.GetOrdinal("Price");
+                //            while (reader2.Read())
+                //            {
+                //                product.Price = reader2.IsDBNull(priceColumn) ? (decimal?)null : reader2.GetSqlMoney(priceColumn).ToDecimal();
 
-                                byte[] imageBytes = (byte[])reader2[1];
-                                product.Image = "data:image/jpeg;base64, " + Convert.ToBase64String(imageBytes);
-                                break;
-                            }
-                        }
-                    }
-                }
+                //                // product.Image = reader2[1].ToString();
+                //                //byte[] imageBytes = (byte[])reader2[1];
+                //                //product.Image = "data:image/jpeg;base64, " + Convert.ToBase64String(imageBytes);
+                //                break;
+                //            }
+                //        }
+                //    }
+                //}
             }
         }
         public IActionResult Index()
@@ -131,36 +149,45 @@ namespace OrganicFarmStore.Controllers
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        int idColumn = reader.GetOrdinal("ID");
+                        int nameColumn = reader.GetOrdinal("ProductName");
+                        int descriptionColumn = reader.GetOrdinal("ProductDescription");
+                        int imageColumn = reader.GetOrdinal("ProductImages");
+                        int priceColumn = reader.GetOrdinal("Price");
+
+
                         while (reader.Read())
                         {
                             p = new Product
                             {
-                                ID = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                Description = reader.GetString(2)
+                                ID = reader.GetInt32(idColumn),
+                                Name = reader.GetString(nameColumn),
+                                Description = reader.GetString(descriptionColumn),
+                                Image = reader.GetString(imageColumn),
+                                Price = reader.GetSqlMoney(priceColumn).ToDecimal()
                             };
                         }
                     }
-                    if (p != null)
-                    {
-                        using (SqlCommand imageAndPriceCommand = connection.CreateCommand())
-                        {
+                    //if (p != null)
+                    //{
+                    //    using (SqlCommand imageAndPriceCommand = connection.CreateCommand())
+                    //    {
 
-                            imageAndPriceCommand.CommandText = "sp_GetProductImages";
-                            imageAndPriceCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                            imageAndPriceCommand.Parameters.AddWithValue("@productModelID", p.ID);
-                            using (SqlDataReader reader2 = imageAndPriceCommand.ExecuteReader())
-                            {
-                                while (reader2.Read())
-                                {
-                                    p.Price = reader2.IsDBNull(0) ? (decimal?)null : reader2.GetSqlMoney(0).ToDecimal();
-                                    byte[] imageBytes = (byte[])reader2[1];
-                                    p.Image = "data:image/jpeg;base64, " + Convert.ToBase64String(imageBytes);
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    //        imageAndPriceCommand.CommandText = "sp_GetProductImages";
+                    //        imageAndPriceCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    //        imageAndPriceCommand.Parameters.AddWithValue("@productModelID", p.ID);
+                    //        using (SqlDataReader reader2 = imageAndPriceCommand.ExecuteReader())
+                    //        {
+                    //            while (reader2.Read())
+                    //            {
+                    //                p.Price = reader2.IsDBNull(0) ? (decimal?)null : reader2.GetSqlMoney(0).ToDecimal();
+                    //                byte[] imageBytes = (byte[])reader2[1];
+                    //                p.Image = "data:image/jpeg;base64, " + Convert.ToBase64String(imageBytes);
+                    //                break;
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
                 
                 if(p != null)

@@ -14,6 +14,13 @@ namespace OrganicFarmStore.Models
         [Required]
        [MinLength(5, ErrorMessage ="Your password must be atlest 5 characters")]
         public string Password { get; set; }
+        public string Email { get; set; }
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; }
+        [Display(Name ="First Name")]
+        public string FirstName { get; set; }
+        [Display(Name ="Last Name")]
+        public string LastName { get; set; }
 
     }
 }

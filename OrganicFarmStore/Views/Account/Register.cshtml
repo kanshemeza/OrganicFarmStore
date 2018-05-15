@@ -1,4 +1,4 @@
-﻿
+﻿@model RegisterViewModel
 @{
     ViewData["Title"] = "Register";
 }
@@ -14,14 +14,33 @@
         </div>
 
     }
-    <form method="post">
+    <form method="post" asp-action="Register" asp-controller="Account">
+
         <div class="form-group">
-            <label for="=username">User Name</label>
-            <input name="username" placeholder="Enter your username" class="form-control" type="text" />
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" placeholder="Enter your First Name" class="form-control" type="text" />
         </div>
         <div class="form-group">
-            <label for="=password">Password</label>
-            <input name="password" class="form-control" placeholder="Enter your password" type="password" />
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" placeholder="Enter your Last Name" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label asp-for="PhoneNumber"></label>
+            <input asp-for="PhoneNumber" placeholder="(111)-222-3333" class="form-control" type="tel" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" placeholder="Enter your Email" class="form-control" type="email" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="UserName"></label>
+            <input asp-for="UserName" placeholder="Enter your username" class="form-control" type="text" />
+
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" placeholder="Enter your password" class="form-control" type="password" />
         </div>
 
         <input type="submit" class="btn btn-primary" value="Submit" />

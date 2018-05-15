@@ -9,11 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using OrganicFarmStore.Models;
 
 namespace OrganicFarmStore
 {
     public class Startup
     {
+        //Represents the entry point for reading configuration data
         public IConfiguration Configuration { get; } // Will help reading our secrets.json file which contains our connection string
         public Startup(IConfiguration configuration) 
         {
@@ -26,6 +28,7 @@ namespace OrganicFarmStore
         {
             Configuration.GetConnectionString("AdventureWorks2016");
             Configuration.GetConnectionString("FinalProjDB");
+            string organicFarmStoreConnectionString = Configuration.GetConnectionString("OrganicFarmStore");
 
             //Singleton:Creates one service when the app starts then it will be the same for every request
             //Transient:Constructed and destructed every single request
@@ -38,15 +41,17 @@ namespace OrganicFarmStore
             //using Microsoft.EntityFrameworkCore;
             //using Microsoft.AspNetCore.Identity;
 
-            services.AddDbContext<IdentityDbContext>(opt => opt.UseInMemoryDatabase("Identities"));
+            // services.AddDbContext<IdentityDbContext>(opt => opt.UseInMemoryDatabase("Identities"));
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+            services.AddDbContext<OrganicStoreDbContext>(opt => opt.UseSqlServer(organicFarmStoreConnectionString));
+
+            services.AddIdentity<OrganicStoreUser, IdentityRole>(options => {
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             })
-                .AddEntityFrameworkStores<IdentityDbContext>() // Will store Identity user info
+                .AddEntityFrameworkStores<OrganicStoreDbContext>() // Will store Identity user info
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
