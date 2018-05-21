@@ -16,7 +16,7 @@ namespace OrganicFarmStore.Controllers
         {
             _context = context;
         }
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
         {
             Guid cartId;
             Cart cart = null;
@@ -24,10 +24,10 @@ namespace OrganicFarmStore.Controllers
             {
                 if (Guid.TryParse(Request.Cookies["cartId"], out cartId))
                 {
-                    cart = _context.Carts
+                    cart = await _context.Carts
                         .Include(carts => carts.CartItems)
                         .ThenInclude(cartitems => cartitems.Product)
-                        .FirstOrDefault(x => x.CookieIdentifier == cartId);
+                        .FirstOrDefaultAsync(x => x.CookieIdentifier == cartId);
                 }
             }
             if (cart == null)
@@ -37,7 +37,7 @@ namespace OrganicFarmStore.Controllers
             return View(cart);
         }
 
-        public IActionResult Remove(int id)
+        public async Task<IActionResult> Remove(int id)
         {
             Guid cartId;
             Cart cart = null;
@@ -45,10 +45,10 @@ namespace OrganicFarmStore.Controllers
             {
                 if (Guid.TryParse(Request.Cookies["cartId"], out cartId))
                 {
-                    cart = _context.Carts
+                    cart = await _context.Carts
                         .Include(carts => carts.CartItems)
                         .ThenInclude(cartitems => cartitems.Product)
-                        .FirstOrDefault(x => x.CookieIdentifier == cartId);
+                        .FirstOrDefaultAsync(x => x.CookieIdentifier == cartId);
                 }
             }
             CartItem item = cart.CartItems.FirstOrDefault(x => x.ID == id);
@@ -57,7 +57,7 @@ namespace OrganicFarmStore.Controllers
 
             _context.CartItems.Remove(item);
 
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
             return RedirectToAction("Index");
 
         }

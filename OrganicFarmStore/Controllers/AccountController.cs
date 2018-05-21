@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using OrganicFarmStore.Models;
 
 
@@ -12,9 +13,11 @@ namespace OrganicFarmStore.Controllers
     public class AccountController : Controller
     {
         SignInManager<OrganicStoreUser> _signInManager;
-        public AccountController(SignInManager<OrganicStoreUser> signInManager)
+        string _sendGridKey;
+        public AccountController(SignInManager<OrganicStoreUser> signInManager, IConfiguration configuration)
         {
             this._signInManager = signInManager;
+            this._sendGridKey = configuration["SendGridKey"];
         }
         
         public IActionResult Index()
@@ -31,7 +34,7 @@ namespace OrganicFarmStore.Controllers
         //Responds on POST of /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken] //Demands the right token from the submitted page by making sure original user heuristics are the same
-        public IActionResult Register(RegisterViewModel model) //We're binding the RegisterViewModel model class to access it's properties
+        public async Task<IActionResult> Register(RegisterViewModel model) //We're binding the RegisterViewModel model class to access it's properties
         {
             if (ModelState.IsValid)
             {
@@ -45,12 +48,12 @@ namespace OrganicFarmStore.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName
                 };
-                IdentityResult creationResult = this._signInManager.UserManager.CreateAsync(newUser).Result;
+                IdentityResult creationResult =await this._signInManager.UserManager.CreateAsync(newUser);
 
                 if (creationResult.Succeeded)
                 {
                     //TODO: Create an account and log this user in
-                    IdentityResult passwordResult = this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password).Result;
+                    IdentityResult passwordResult = await this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password);
                     if (passwordResult.Succeeded)
                     {
                         //this._signInManager.SignInAsync(newUser, false);
@@ -86,18 +89,18 @@ namespace OrganicFarmStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SignIn(string email, string password)
+        public async Task<IActionResult> SignIn(string email, string password)
         {
             if (ModelState.IsValid)
             {
                 // IdentityUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
-                OrganicStoreUser existingUser = _signInManager.UserManager.FindByNameAsync(email).Result;
+                OrganicStoreUser existingUser = await _signInManager.UserManager.FindByNameAsync(email);
                 if (existingUser != null)
                 {
-                    Microsoft.AspNetCore.Identity.SignInResult passwordResult =this._signInManager.CheckPasswordSignInAsync(existingUser, password, false).Result;
+                    Microsoft.AspNetCore.Identity.SignInResult passwordResult =await this._signInManager.CheckPasswordSignInAsync(existingUser, password, false);
                     if (passwordResult.Succeeded)
                     {
-                        _signInManager.SignInAsync(existingUser, false).Wait();
+                       await _signInManager.SignInAsync(existingUser, false);
                         return RedirectToAction("Index", "Product");
                     }
                     else
@@ -112,9 +115,9 @@ namespace OrganicFarmStore.Controllers
             }
             return View();
         }
-        public IActionResult SignOut()
+        public async Task<IActionResult> SignOut()
         {
-           this._signInManager.SignOutAsync().Wait();
+            await this._signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

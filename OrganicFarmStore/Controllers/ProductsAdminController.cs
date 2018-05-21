@@ -103,7 +103,7 @@ namespace OrganicFarmStore.Controllers
 
             using (System.IO.FileStream fs = newFileInfo.Create())
             {
-                imageFile.CopyTo(fs);
+               await imageFile.CopyToAsync(fs);
                 fs.Close();
             }
 
