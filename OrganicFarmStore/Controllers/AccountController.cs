@@ -13,13 +13,19 @@ namespace OrganicFarmStore.Controllers
     public class AccountController : Controller
     {
         SignInManager<OrganicStoreUser> _signInManager;
-        string _sendGridKey;
-        public AccountController(SignInManager<OrganicStoreUser> signInManager, IConfiguration configuration)
+        //string _sendGridKey;
+        EmailService _emailService;
+        //public AccountController(SignInManager<OrganicStoreUser> signInManager, IConfiguration configuration)
+        //{
+        //    this._signInManager = signInManager;
+        //    this._sendGridKey = configuration["SendGridKey"];
+        //}
+        public AccountController(SignInManager<OrganicStoreUser> signInManager, EmailService emailService)
         {
             this._signInManager = signInManager;
-            this._sendGridKey = configuration["SendGridKey"];
+            this._emailService = emailService;
         }
-        
+
         public IActionResult Index()
         {
             return View();
@@ -56,8 +62,38 @@ namespace OrganicFarmStore.Controllers
                     IdentityResult passwordResult = await this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password);
                     if (passwordResult.Succeeded)
                     {
+                        #region use the SendGrid client to send a welcome email
+                        var emailResult = await this._emailService.SendEmailAsync(
+                        model.Email,
+                        "Welcome to BikeStore!",
+                        "Thanks for signing up, " + model.UserName + "!",
+                        "<p>Thanks for signing up, " + model.UserName + "!</p>"
+                    );
+                        if (emailResult.Success)
+                            return RedirectToAction("Index", "Home");
+                        else
+                            return BadRequest(emailResult.Message);
+                        #endregion
+
+                        //#region use the SendGrid client to send a welcome email
+                        //var client = new SendGrid.SendGridClient(_sendGridKey);
+                        //var senderAddress = new SendGrid.Helpers.Mail.EmailAddress("admin@ctostore.com", "CT O-Store");
+                        //var subject = "Welcome to OrganicStore";
+                        //var to = new SendGrid.Helpers.Mail.EmailAddress(model.Email, model.Email);
+                        //var plainText = "Thanks for signing up, " + model.FirstName + "!";
+                        //var htmlText = "<p> Thanks for signing up with us, " + model.FirstName + "!</p>";
+                        //var message = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(senderAddress, to, subject, plainText, htmlText);
+                        //var mailResult = await client.SendEmailAsync(message);
+
+                        //if ((mailResult.StatusCode == System.Net.HttpStatusCode.OK) || (mailResult.StatusCode == System.Net.HttpStatusCode.Accepted))
+                        //    return RedirectToAction("RegisterConfirmation");
+                        //else
+                        //    return BadRequest(await mailResult.Body.ReadAsStringAsync());
+
+                        //#endregion
+
                         //this._signInManager.SignInAsync(newUser, false);
-                        return RedirectToAction("SignIn", "Account");
+                        // return RedirectToAction("SignIn", "Account");
                     }
                     else
                     {
@@ -79,6 +115,11 @@ namespace OrganicFarmStore.Controllers
 
                // return RedirectToAction("Index", "Home");
             }
+            return View();
+        }
+
+        public IActionResult RegisterConfirmation()
+        {
             return View();
         }
 

@@ -54,7 +54,10 @@ namespace OrganicFarmStore
                 .AddEntityFrameworkStores<OrganicStoreDbContext>() // Will store Identity user info
                 .AddDefaultTokenProviders();
 
+            services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
+
             services.AddMvc();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

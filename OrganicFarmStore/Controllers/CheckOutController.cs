@@ -4,16 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OrganicFarmStore.Models;
 
 namespace OrganicFarmStore.Controllers
 {
     public class CheckOutController : Controller
     {
+        string _sendGridKey;
         private readonly OrganicStoreDbContext _context;
-        public CheckOutController(OrganicStoreDbContext context)
+        public CheckOutController(OrganicStoreDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _sendGridKey = configuration["SendGridKey"];
         }
         public IActionResult Index()
         {
@@ -22,7 +25,7 @@ namespace OrganicFarmStore.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(Checkout checkout)
+        public async Task<IActionResult> Index(Checkout checkout, EmailReceipt model)
         {
             if (ModelState.IsValid)
             {
@@ -67,12 +70,32 @@ namespace OrganicFarmStore.Controllers
 
                     }
                 }
+
+                #region use the SendGrid client to send a welcome email
+                var client = new SendGrid.SendGridClient(_sendGridKey);
+                var senderAddress = new SendGrid.Helpers.Mail.EmailAddress("admin@o-store.com", "Organic-Farm Store");
+                var subject = "Your Receipt";
+                var to = new SendGrid.Helpers.Mail.EmailAddress(model.Email, model.Email);
+                var plainText = "Thanks for signing up, " + model.FirstName + "!";
+                var htmlText = "<p> Thanks for Shopping with us, " + model.FirstName + "!</p>";
+                var message = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(senderAddress, to, subject, plainText, htmlText);
+                var mailResult = await client.SendEmailAsync(message);
+
+                if ((mailResult.StatusCode == System.Net.HttpStatusCode.OK) || (mailResult.StatusCode == System.Net.HttpStatusCode.Accepted))
+                    return RedirectToAction("Confirmation");
+                else
+                    return BadRequest(await mailResult.Body.ReadAsStringAsync());
+
+                #endregion
             }
             else
             {
                 return View(checkout);
             }
-            return RedirectToAction("Confirmation");
+
+           
+
+           // return RedirectToAction("Confirmation");
 
         }
 
