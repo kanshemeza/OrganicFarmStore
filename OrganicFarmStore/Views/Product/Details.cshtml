@@ -12,8 +12,20 @@
         <h2>@Model.Name</h2>
         <p>@Model.Description</p>
         <h4>Price: @(Model.Price.HasValue ? Model.Price.Value.ToString("C") : "No Price")</h4>
-        <button class="btn btn-primary">Add to Cart</button>
+       <form method="post" asp-area="" asp-action="AddToCart" asp-controller="Product">
+           <input asp-for="ID" type="hidden" />
+           <select name="quantity">
+               @for(int i = 0; i < 10; i++)
+               {
+                   <option value="@i">@i</option>
+
+               }
+           </select>
+           <input type="submit" class="btn btn-primary" value="Add to Cart" />
+
+       </form>
     </div>
+
 </div>
 
 

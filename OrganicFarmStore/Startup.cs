@@ -58,7 +58,7 @@ namespace OrganicFarmStore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, OrganicStoreDbContext db)
         {
             if (env.IsDevelopment())
             {
@@ -80,6 +80,9 @@ namespace OrganicFarmStore
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // DbInitializer.Initialize(db); //Because of the static keyword on the dbinitializer class and the this keyowrd on the context we can change this to as below
+            db.Initialize();
         }
     }
 }

@@ -11,9 +11,10 @@ using System;
 namespace OrganicFarmStore.Migrations
 {
     [DbContext(typeof(OrganicStoreDbContext))]
-    partial class OrganicStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180517173101_OrdersOrderItems")]
+    partial class OrdersOrderItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

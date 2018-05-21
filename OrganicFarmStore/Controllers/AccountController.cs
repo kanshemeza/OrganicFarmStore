@@ -11,13 +11,6 @@ namespace OrganicFarmStore.Controllers
 {
     public class AccountController : Controller
     {
-        //To use D/I
-        //private SampleService _sampleService;
-        //public AccountController(SampleService sampleService) //parameters on the constructor will be injected in, if they're registered in startup class
-        //{
-        //    this._sampleService = sampleService;
-        //    var taxAmount = this._sampleService.CalculateSalesTax(1000m);
-        //}
         SignInManager<OrganicStoreUser> _signInManager;
         public AccountController(SignInManager<OrganicStoreUser> signInManager)
         {

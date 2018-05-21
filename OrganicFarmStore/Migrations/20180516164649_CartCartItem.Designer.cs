@@ -11,9 +11,10 @@ using System;
 namespace OrganicFarmStore.Migrations
 {
     [DbContext(typeof(OrganicStoreDbContext))]
-    partial class OrganicStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180516164649_CartCartItem")]
+    partial class CartCartItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,56 +163,6 @@ namespace OrganicFarmStore.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("OrganicFarmStore.Models.Order", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("BillingAddress");
-
-                    b.Property<string>("City");
-
-                    b.Property<string>("CreditCardNumber");
-
-                    b.Property<string>("Email");
-
-                    b.Property<DateTime>("ExpirationDate");
-
-                    b.Property<string>("FirstName");
-
-                    b.Property<string>("LastName");
-
-                    b.Property<string>("Phone");
-
-                    b.Property<string>("PostalCode");
-
-                    b.Property<string>("State");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("OrganicFarmStore.Models.OrderItem", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("OrderID");
-
-                    b.Property<int?>("ProductID");
-
-                    b.Property<int>("Quantity");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("OrderID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("OrderItems");
-                });
-
             modelBuilder.Entity("OrganicFarmStore.Models.OrganicStoreUser", b =>
                 {
                     b.Property<string>("Id")
@@ -349,17 +300,6 @@ namespace OrganicFarmStore.Migrations
                     b.HasOne("OrganicFarmStore.Models.Cart", "Cart")
                         .WithMany("CartItems")
                         .HasForeignKey("CartID");
-
-                    b.HasOne("OrganicFarmStore.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductID");
-                });
-
-            modelBuilder.Entity("OrganicFarmStore.Models.OrderItem", b =>
-                {
-                    b.HasOne("OrganicFarmStore.Models.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderID");
 
                     b.HasOne("OrganicFarmStore.Models.Product", "Product")
                         .WithMany()
