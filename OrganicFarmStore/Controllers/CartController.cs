@@ -16,6 +16,7 @@ namespace OrganicFarmStore.Controllers
         {
             _context = context;
         }
+
     public async Task<IActionResult> Index()
         {
             Guid cartId;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +55,7 @@ namespace OrganicFarmStore.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName
                 };
-                IdentityResult creationResult =await this._signInManager.UserManager.CreateAsync(newUser);
+                IdentityResult creationResult =await _signInManager.UserManager.CreateAsync(newUser);
 
                 if (creationResult.Succeeded)
                 {
@@ -62,17 +63,28 @@ namespace OrganicFarmStore.Controllers
                     IdentityResult passwordResult = await this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password);
                     if (passwordResult.Succeeded)
                     {
+                        var confirmationToken = await _signInManager.UserManager.GenerateEmailConfirmationTokenAsync(newUser);
+                        
+                        confirmationToken = System.Net.WebUtility.UrlEncode(confirmationToken); // This will format our token which might have the plus signs, dashes, etc
+                        
+                        string currentUrl = Request.GetDisplayUrl();    //This will get me the URL for the current request
+                        System.Uri uri = new Uri(currentUrl);   //This will wrap it in a "URI" object so I can split it into parts
+                        string confirmationUrl = uri.GetLeftPart(UriPartial.Authority); //This gives me just the scheme + authority of the URI
+                        confirmationUrl += "/account/confirm?id=" + confirmationToken + "&userId=" + System.Net.WebUtility.UrlEncode(newUser.Id);
+
                         #region use the SendGrid client to send a welcome email
-                        var emailResult = await this._emailService.SendEmailAsync(
+                        var mailResult = await _emailService.SendEmailAsync(
                         model.Email,
                         "Welcome to BikeStore!",
-                        "Thanks for signing up, " + model.UserName + "!",
-                        "<p>Thanks for signing up, " + model.UserName + "!</p>"
+                         "<p>Thanks for signing up, " + model.UserName + "!</p><p><a href=\"" + confirmationUrl + "\">Confirm your account<a></p>",
+                          "Thanks for signing up, " + model.UserName + "!"
+                        //"Thanks for signing up, " + model.UserName + "!",
+                        //"<p>Thanks for signing up, " + model.UserName + "!</p>"
                     );
-                        if (emailResult.Success)
-                            return RedirectToAction("Index", "Home");
+                        if (mailResult.Success)
+                            return RedirectToAction("RegisterConfirmation");
                         else
-                            return BadRequest(emailResult.Message);
+                            return BadRequest(mailResult.Message);
                         #endregion
 
                         //#region use the SendGrid client to send a welcome email
@@ -160,6 +172,81 @@ namespace OrganicFarmStore.Controllers
         {
             await this._signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            if ((ModelState.IsValid) && (!string.IsNullOrEmpty(email)))
+            {
+                var user = await _signInManager.UserManager.FindByEmailAsync(email);
+                if (user != null)
+                {
+                    var resetToken = await _signInManager.UserManager.GeneratePasswordResetTokenAsync(user);
+
+                    resetToken = System.Net.WebUtility.UrlEncode(resetToken);
+                    //using Microsoft.AspNetCore.Http.Extensions;
+                    string currentUrl = Request.GetDisplayUrl();    //This will get me the URL for the current request
+                    System.Uri uri = new Uri(currentUrl);   //This will wrap it in a "URI" object so I can split it into parts
+                    string resetUrl = uri.GetLeftPart(UriPartial.Authority); //This gives me just the scheme + authority of the URI
+                    resetUrl += "/account/resetpassword?id=" + resetToken + "&userId=" + System.Net.WebUtility.UrlEncode(user.Id);
+
+                    string htmlContent = "<a href=\"" + resetUrl + "\">Reset your password</a>";
+                    var emailResult = await _emailService.SendEmailAsync(email, "Reset your password", htmlContent, resetUrl);
+                    if (!emailResult.Success)
+                    {
+                        throw new Exception(string.Join(',', emailResult.Errors.Select(x => x.Message)));
+                        
+                    }
+                    return RedirectToAction("ResetSent");
+                }
+            }
+            ModelState.AddModelError("email", "Email is not valid");
+            return View();
+        }
+
+
+        public IActionResult ResetSent()
+        {
+            return View();
+        }
+
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(string id, string userId, string password)
+        {
+            var user = await _signInManager.UserManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                await _signInManager.UserManager.ResetPasswordAsync(user, id, password);
+                return RedirectToAction("SignIn");
+            }
+            return BadRequest();
+        }
+
+        public async Task<IActionResult> Confirm(string id, string userId)
+        {
+            var user = await _signInManager.UserManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                await _signInManager.UserManager.ConfirmEmailAsync(user, id);
+                return RedirectToAction("Index", "Home");
+            }
+            return BadRequest();
+
+
         }
     }
 }

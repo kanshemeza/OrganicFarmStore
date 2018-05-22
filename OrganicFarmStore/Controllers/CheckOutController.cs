@@ -20,7 +20,7 @@ namespace OrganicFarmStore.Controllers
         }
         public IActionResult Index()
         {
-
+           
             return View();
         }
 

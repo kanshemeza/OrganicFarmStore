@@ -7,9 +7,29 @@ namespace OrganicFarmStore
 {
     public class SendEmailResult
     {
+        public SendEmailResult()
+        {
+            this.Errors = new HashSet<SendEmailError>();
+        }
+
         public bool Success { get; set; }
         public string Message { get; set; }
+        public ICollection<SendEmailError> Errors { get; set; }
+
+
+        public class SendEmailError
+        {
+            public string Message { get; set; }
+            public string Field { get; set; }
+            public string Help { get; set; }
+        }
     }
+
+    //public class SendEmailResult
+    //{
+    //    public bool Success { get; set; }
+    //    public string Message { get; set; }
+    //}
 
     public class EmailService
     {
@@ -17,7 +37,7 @@ namespace OrganicFarmStore
 
         public EmailService(string apiKey)
         {
-            this._sendGridClient = new SendGrid.SendGridClient(apiKey);
+            _sendGridClient = new SendGrid.SendGridClient(apiKey);
         }
 
         public async Task<SendEmailResult> SendEmailAsync(string recipient, string subject, string htmlContent, string plainTextContent)
