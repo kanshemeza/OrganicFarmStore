@@ -9,30 +9,62 @@ namespace OrganicFarmStore.Models
     public class Checkout
     {
         [Required]
-        [Display(Name = "First Name")]
-        public string FirstName { get; set; }
+        [Display(Name = "Email")]
+        public string ContactEmail { get; set; }
+
         [Required]
-        [Display(Name = "Last Name")]
-        public string LastName { get; set; }
+        [Display(Name = "Phone Number")]
+        public string ContactPhoneNumber { get; set; }
+
+        public Cart Cart { get; set; }
+
+        [Required]
+        [Display(Name = "Address")]
+        public string ShippingAddressLine1 { get; set; }
+
+        [Required]
+        [Display(Name = "Apartment/Unit/Suite")]
+        public string ShippingAddressLine2 { get; set; }
+
+        [Required]
+        [Display(Name = "City")]
+        public string ShippingLocale { get; set; }
+
+        [Required]
+
+        [Display(Name = "State")]
+        public string ShippingRegion { get; set; }
+
+        [Required]
+        [Display(Name = "Country")]
+        public string ShippingCountry { get; set; }
+
+        [Required]
+        [Display(Name = "Zip Code")]
+        public string ShippingPostalCode { get; set; }
+
+        [Required]
+        [Display(Name = "Name on Card")]
+        public string BillingNameOnCard { get; set; }
+
+
+        //[CreditCard]  -- A little buggy!
         [Required]
         [Display(Name = "Credit Card Number")]
-        public string CreditCardNumber { get; set; }
+        [MaxLength(16)]
+        public string BillingCardNumber { get; set; }
+
         [Required]
         [Display(Name = "Expiration Date")]
-        public DateTime ExpirationDate { get; set; }
+        [Range(1, 12)]
+        public int BillingCardExpirationMonth { get; set; }
+
         [Required]
-        [Display(Name = "Billing Address")]
-        public string BillingAddress { get; set; }
+        public int BillingCardExpirationYear { get; set; }
+
         [Required]
-        public string City { get; set; }
-        [Required]
-        public string State { get; set; }
-        [Required]
-        [Display(Name = "Postal Code")]
-        public string PostalCode { get; set; }
-        [Required]
-        public string Phone { get; set; }
-        [Required]
-        public string Email { get; set; }
+        [Display(Name = "CVV/CVV2")]
+        public string BillingCardVerificationValue { get; set; }
+
     }
 }

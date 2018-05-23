@@ -45,7 +45,8 @@ namespace OrganicFarmStore
 
             services.AddDbContext<OrganicStoreDbContext>(opt => opt.UseSqlServer(organicFarmStoreConnectionString));
 
-            services.AddIdentity<OrganicStoreUser, IdentityRole>(options => {
+            services.AddIdentity<OrganicStoreUser, IdentityRole>(options =>
+            {
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
@@ -53,11 +54,16 @@ namespace OrganicFarmStore
             })
                 .AddEntityFrameworkStores<OrganicStoreDbContext>() // Will store Identity user info
                 .AddDefaultTokenProviders();
-
-            services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
-
             services.AddMvc();
 
+            services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
+            services.AddTransient((x) => {
+                return new Braintree.BraintreeGateway(
+                    Configuration["BraintreeEnvironment"],
+                    Configuration["BraintreeMerchantId"],
+                    Configuration["BraintreePublicKey"],
+                    Configuration["BraintreePrivateKey"]);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

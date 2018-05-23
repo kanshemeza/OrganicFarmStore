@@ -15,14 +15,13 @@ namespace OrganicFarmStore
         public bool Success { get; set; }
         public string Message { get; set; }
         public ICollection<SendEmailError> Errors { get; set; }
+    }
 
-
-        public class SendEmailError
-        {
-            public string Message { get; set; }
-            public string Field { get; set; }
-            public string Help { get; set; }
-        }
+    public class SendEmailError
+    {
+        public string Message { get; set; }
+        public string Field { get; set; }
+        public string Help { get; set; }
     }
 
     //public class SendEmailResult
