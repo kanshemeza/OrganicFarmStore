@@ -17,6 +17,7 @@ namespace OrganicFarmStore
     {
         //Represents the entry point for reading configuration data
         public IConfiguration Configuration { get; } // Will help reading our secrets.json file which contains our connection string
+
         public Startup(IConfiguration configuration) 
         {
             Configuration = configuration;
@@ -26,8 +27,9 @@ namespace OrganicFarmStore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Configuration.GetConnectionString("AdventureWorks2016");
-            Configuration.GetConnectionString("FinalProjDB");
+            //Configuration.GetConnectionString("AdventureWorks2016");
+            //Configuration.GetConnectionString("FinalProjDB");
+
             string organicFarmStoreConnectionString = Configuration.GetConnectionString("OrganicFarmStore");
 
             //Singleton:Creates one service when the app starts then it will be the same for every request
@@ -54,6 +56,7 @@ namespace OrganicFarmStore
             })
                 .AddEntityFrameworkStores<OrganicStoreDbContext>() // Will store Identity user info
                 .AddDefaultTokenProviders();
+
             services.AddMvc();
 
             services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
@@ -63,6 +66,16 @@ namespace OrganicFarmStore
                     Configuration["BraintreeMerchantId"],
                     Configuration["BraintreePublicKey"],
                     Configuration["BraintreePrivateKey"]);
+            });
+
+            services.AddTransient((x) =>
+            {
+                SmartyStreets.ClientBuilder builder = new SmartyStreets.ClientBuilder(Configuration["SmartyStreetsAuthId"], Configuration["SmartyStreestsAuthToken"]);
+                return builder.BuildUsStreetApiClient();
+
+                //SmartyStreets.ClientBuilder builder = new SmartyStreets.ClientBuilder(Configuration["SmartyStreetsAuthId"],
+                //    Configuration["SmartyStreetsAuthToken"]);
+                //return builder.BuildUsStreetApiClient();
             });
         }
 

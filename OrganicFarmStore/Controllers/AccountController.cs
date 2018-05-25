@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Braintree;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,18 +14,23 @@ namespace OrganicFarmStore.Controllers
 {
     public class AccountController : Controller
     {
+        private BraintreeGateway _braintreeGateway;
         SignInManager<OrganicStoreUser> _signInManager;
         //string _sendGridKey;
         EmailService _emailService;
+
         //public AccountController(SignInManager<OrganicStoreUser> signInManager, IConfiguration configuration)
         //{
         //    this._signInManager = signInManager;
         //    this._sendGridKey = configuration["SendGridKey"];
         //}
-        public AccountController(SignInManager<OrganicStoreUser> signInManager, EmailService emailService)
+        public AccountController(SignInManager<OrganicStoreUser> signInManager, 
+            EmailService emailService,
+            BraintreeGateway braintreeGateway)
         {
             this._signInManager = signInManager;
             this._emailService = emailService;
+            _braintreeGateway = braintreeGateway;
         }
 
         public IActionResult Index()
@@ -63,6 +69,35 @@ namespace OrganicFarmStore.Controllers
                     IdentityResult passwordResult = await this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password);
                     if (passwordResult.Succeeded)
                     {
+
+                        Braintree.CustomerSearchRequest search = new Braintree.CustomerSearchRequest();
+                        search.Email.Is(model.Email);
+                        var searchResult = await _braintreeGateway.Customer.SearchAsync(search);
+                        if (searchResult.Ids.Count == 0)
+                        {
+                            //Create  a new Braintree Customer
+                            await _braintreeGateway.Customer.CreateAsync(new Braintree.CustomerRequest
+                            {
+                                Email = model.Email,
+                                FirstName = model.FirstName,
+                                LastName = model.LastName,
+                                Phone = model.PhoneNumber
+                            });
+                        }
+                        else
+                        {
+
+                            //Update the existing Braintree customer
+                            Braintree.Customer existingCustomer = searchResult.FirstItem;
+                            await _braintreeGateway.Customer.UpdateAsync(existingCustomer.Id, new Braintree.CustomerRequest
+                            {
+                                FirstName = model.FirstName,
+                                LastName = model.LastName,
+                                Phone = model.PhoneNumber
+                            });
+                        }
+
+
                         var confirmationToken = await _signInManager.UserManager.GenerateEmailConfirmationTokenAsync(newUser);
                         
                         confirmationToken = System.Net.WebUtility.UrlEncode(confirmationToken); // This will format our token which might have the plus signs, dashes, etc

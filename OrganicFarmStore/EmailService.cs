@@ -42,7 +42,7 @@ namespace OrganicFarmStore
         public async Task<SendEmailResult> SendEmailAsync(string recipient, string subject, string htmlContent, string plainTextContent)
         {
 
-            var from = new SendGrid.Helpers.Mail.EmailAddress("admin@codingtemplebikes.com", "Coding Temple Bikes");
+            var from = new SendGrid.Helpers.Mail.EmailAddress("admin@O-Farmstore.com", "Organic-Farm Store");
 
             var to = new SendGrid.Helpers.Mail.EmailAddress(recipient);
             var message = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
