@@ -12,30 +12,65 @@
 else
 {
     <table class="table table-striped">
-        @foreach (var item in Model.CartItems)
-        {
-            <tr>
-                <td>@item.Product.Name</td>
-                <td>@item.Product.Description</td>
-                <td><img src="@item.Product.Image" class="img-fluid" /></td>
-                <td>@((item.Product.Price ?? 0).ToString("c"))</td>
-                <td>@item.Quantity</td>
-                <td>@((item.Quantity * (item.Product.Price ?? 0)).ToString("c"))</td>
-                <td>
-                    <form method="post" asp-action="remove">
-                        <input type="hidden" name="id" value="@item.ID" />
-                        <input type="submit" value="Remove" class="btn btn-primary" />
-                    </form>
-                </td>
-
-            </tr>
-        }
-
         <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Image</th>
+            <th>Unit Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+        </tr>
+        @foreach (var item in Model.CartItems)
+    {
+        <tr>
+            <td>@item.Product.Name</td>
+            <td>@item.Product.Description</td>
+            <td><img src="@item.Product.Image" class="img-fluid" /></td>
+            <td>@((item.Product.Price ?? 0).ToString("c"))</td>
             <td>
-                <a asp-action="Index" asp-controller="Checkout" class="btn btn-primary">Checkout</a>
+                <form method="post" asp-action="edit">
+                    <input type="hidden" name="ID" value="@item.ID" />
+                    <input id="quantity" value=" @item.Quantity" name="quantity" type="text" />
+                    <input type="submit" name="edit" value="Update" />
+                </form>
+
+            </td>
+            <td>@((item.Quantity * (item.Product.Price ?? 0)).ToString("c"))</td>
+            <td>
+                <form method="post" asp-action="remove">
+                    <input type="hidden" name="id" value="@item.ID" />
+                    <input type="submit" value="Remove" class="btn btn-primary" />
+                </form>
             </td>
         </tr>
+}
+        <tr>
+            <th colspan="5">TotalCost</th>
+
+            <th>
+                @(Model.CartItems.Sum(x => x.Quantity * (x.Product.Price ?? 0)).ToString("c"))</th>
+            <th>
+                <form method="post" asp-action="index">
+                    <input type="submit" value="Checkout" class="btn btn-primary" />
+                </form>
+            </th>
+        </tr>
+
+        @*<tr>
+            <td>
+                <a asp-action="Index" asp-controller="Checkout" class="btn btn-primary float-right">Checkout</a>
+            </td>
+        </tr>*@
     </table>
 
+}
+
+@section Scripts{ 
+    <script type="text/javascript">
+        function NewCost() {
+            var x = document.getElementById("quantity").value;
+            console.log(x);
+
+        }
+    </script>
 }

@@ -86,7 +86,7 @@ namespace OrganicFarmStore.Controllers
         }
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Index(Checkout model, EmailReceipt emailReceipt)
+        public async Task<IActionResult> Index(Checkout model)
         {
             await GetCurrentCart(model);
             model.Addresses = new Address[0];
@@ -229,10 +229,11 @@ namespace OrganicFarmStore.Controllers
 
                         Response.Cookies.Delete("cartId");
 
-                        var plainText = "Thanks for signing up, " + emailReceipt.FirstName + "!";
-                        var htmlText = "<p> Thanks for Shopping with us, " + emailReceipt.FirstName + "!</p>";
-
-                        await _emailService.SendEmailAsync(emailReceipt.Email, "Your Receipt", htmlText, plainText);
+                        RegisterViewModel regModel = new RegisterViewModel();
+                        var plainText = "Thanks for signing up, " + regModel.FirstName + "!";
+                        var htmlText = "<p> Thanks for Shopping with us, " + regModel.FirstName + "!</p>";
+                        
+                        await _emailService.SendEmailAsync(model.ContactEmail, "Your Receipt", htmlText, plainText);
 
 
 

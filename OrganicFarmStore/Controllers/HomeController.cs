@@ -11,8 +11,10 @@ namespace OrganicFarmStore.Controllers
     public class HomeController : Controller
     {
         private List<Product> _products;
-        public HomeController()
+        private EmailService _emailService;
+        public HomeController(EmailService emailService)
         {
+            _emailService = emailService;
             _products = new List<Product>();
             {
                 _products.Add(new Product
@@ -77,11 +79,17 @@ namespace OrganicFarmStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Contact(ContactViewModel model)
+        public async Task<IActionResult> Contact(ContactViewModel model)
         {
             if (ModelState.IsValid)
             {
-                return RedirectToAction("Index", "Home");
+
+                var plainText = model.Message;
+                var htmlText = model.Message;
+                var subjectText = model.Subject;
+
+                await _emailService.ContactEmailAsync(model.Email, subjectText,htmlText, plainText);
+                return RedirectToAction("ContactForm");
             }
             return View(model);
         }
@@ -89,6 +97,11 @@ namespace OrganicFarmStore.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult ContactForm()
+        {
+            return View();
         }
     }
 }

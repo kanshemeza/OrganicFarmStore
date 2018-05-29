@@ -53,12 +53,37 @@ namespace OrganicFarmStore.Controllers
                 }
             }
             CartItem item = cart.CartItems.FirstOrDefault(x => x.ID == id);
-
+           
             cart.LastModified = DateTime.Now;
-
             _context.CartItems.Remove(item);
 
            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+
+        }
+
+        public async Task<IActionResult> Edit(int id, int quantity)
+        {
+            Guid cartId;
+            Cart cart = null;
+            if (Request.Cookies.ContainsKey("cartId"))
+            {
+                if (Guid.TryParse(Request.Cookies["cartId"], out cartId))
+                {
+                    cart = await _context.Carts
+                        .Include(carts => carts.CartItems)
+                        .ThenInclude(cartitems => cartitems.Product)
+                        .FirstOrDefaultAsync(x => x.CookieIdentifier == cartId);
+                }
+            }
+            
+               CartItem item = cart.CartItems.FirstOrDefault(x => x.ID == id);
+            item.Quantity =quantity;
+            cart.LastModified = DateTime.Now;
+
+            _context.CartItems.Update(item);
+
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index");
 
         }

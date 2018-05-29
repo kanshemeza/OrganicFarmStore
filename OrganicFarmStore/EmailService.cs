@@ -66,5 +66,32 @@ namespace OrganicFarmStore
             }
         }
 
+        public async Task<SendEmailResult> ContactEmailAsync(string sender, string subject, string htmlContent, string plainTextContent)
+        {
+
+            var to = new SendGrid.Helpers.Mail.EmailAddress("amonmwesiga@gmail.com");
+
+            var from = new SendGrid.Helpers.Mail.EmailAddress(sender);
+            var message = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            var mailResult = await _sendGridClient.SendEmailAsync(message);
+
+
+            if ((mailResult.StatusCode == System.Net.HttpStatusCode.OK) || (mailResult.StatusCode == System.Net.HttpStatusCode.Accepted))
+            {
+                return new SendEmailResult
+                {
+                    Success = true
+                };
+            }
+            else
+            {
+                return new SendEmailResult
+                {
+                    Success = false,
+                    Message = await mailResult.Body.ReadAsStringAsync()
+                };
+            }
+        }
+
     }
 }

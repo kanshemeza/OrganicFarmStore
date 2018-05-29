@@ -110,7 +110,7 @@ namespace OrganicFarmStore.Controllers
                         #region use the SendGrid client to send a welcome email
                         var mailResult = await _emailService.SendEmailAsync(
                         model.Email,
-                        "Welcome to BikeStore!",
+                        "Welcome to Organic-Farm Store!",
                          "<p>Thanks for signing up, " + model.UserName + "!</p><p><a href=\"" + confirmationUrl + "\">Confirm your account<a></p>",
                           "Thanks for signing up, " + model.UserName + "!"
                         //"Thanks for signing up, " + model.UserName + "!",
@@ -233,7 +233,7 @@ namespace OrganicFarmStore.Controllers
                     string resetUrl = uri.GetLeftPart(UriPartial.Authority); //This gives me just the scheme + authority of the URI
                     resetUrl += "/account/resetpassword?id=" + resetToken + "&userId=" + System.Net.WebUtility.UrlEncode(user.Id);
 
-                    string htmlContent = "<a href=\"" + resetUrl + "\">Reset your password</a>";
+                    string htmlContent = "Click on the link below to reset your password<br><a href=\"" + resetUrl + "\">Reset your password</a>";
                     var emailResult = await _emailService.SendEmailAsync(email, "Reset your password", htmlContent, resetUrl);
                     if (!emailResult.Success)
                     {
